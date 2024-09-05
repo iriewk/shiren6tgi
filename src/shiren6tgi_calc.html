@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attack Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .styled-text {
+            font-size: 4rem;
+            font-weight: bold;
+            background: linear-gradient(to right, #4c51bf, #6b46c1, #e53e3e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 py-8">
+    <div class="max-w-md mx-auto">
+        <div class="bg-white shadow rounded-lg p-6">
+            <h1 class="text-2xl font-bold mb-4">ポイント計算 (Score Calculator) </h1>
+            <div class="tabs">
+                <div class="tab-header flex">
+                    <button class="tab-button bg-gray-200 py-2 px-4 rounded-t-lg focus:outline-none focus:bg-white">タイムアタック<br>(Time Attack)</button>
+                    <button class="tab-button bg-gray-200 py-2 px-4 rounded-t-lg focus:outline-none focus:bg-white">ターンアタック<br>(Turn Attack)</button>
+                </div>
+                <div class="tab-content bg-white p-4 rounded-b-lg shadow">
+                    <div class="tab-pane">
+                        <div class="mb-4">
+                            <label for="time" class="block font-medium text-gray-700 mb-1">タイム (Time)</label>
+                            <input type="time" id="time" onInput="calculateTime()"
+                                class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                step="2" value="00:00:00">
+                        </div>
+                        <div id="time-result-25" class="styled-text"></div>
+                        <div id="time-result-99" class="styled-text"></div>
+                    </div>
+                    <div class="tab-pane hidden">
+                        <div class="mb-4">
+                            <label for="turn" class="block font-medium text-gray-700 mb-1">ターン (Turn) </label>
+                            <input type="text" id="turn" onInput="calculateTurn()"
+                                class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div id="turn-result-25" class="styled-text"></div>
+                        <div id="turn-result-99" class="styled-text"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+        const turnInput = document.getElementById('turn');
+        const timeInput = document.getElementById('time');
+
+        tabButtons.forEach((button, index) => {
+            button.addEventListener('click', () => {
+                // Hide all tab panes
+                tabPanes.forEach((pane) => pane.classList.add('hidden'));
+                // Show the selected tab pane
+                tabPanes[index].classList.remove('hidden');
+            });
+        });
+
+        /**
+         * タイムでポイント計算
+         */ 
+        function calculateTime() {
+            const parts = timeInput.value.split(':').map(Number);
+            const time = parts[0] * 3600 + parts[1] * 60 + parts[2];
+            const result25 = time == 0 ? 0 : Math.round((1200 / time) * 100) + 25;
+            const result99 = time == 0 ? 0 : Math.round((10800 / time) * 100) + 100;
+            document.getElementById('time-result-25').textContent = `25F ${result25}pt`;
+            document.getElementById('time-result-99').textContent = `99F ${result99}pt`;
+        }
+        
+        /**
+         * ターンでポイント計算
+         */ 
+        function calculateTurn() {
+            const turn = Number(turnInput.value);
+            const result25 = turn == 0 ? 0 : Math.round((2500 / turn) * 100) + 26;
+            const result99 = turn == 0 ? 0 : Math.round((17500 / turn) * 100) + 100;
+            document.getElementById('turn-result-25').textContent = `25F ${result25}pt`;
+            document.getElementById('turn-result-99').textContent = `99F ${result99}pt`;
+        }
+
+        timeInput.value = "03:00:00";
+        turnInput.value = "17500";
+        calculateTime();
+        calculateTurn();
+    </script>
+</body>
+
+</html>
