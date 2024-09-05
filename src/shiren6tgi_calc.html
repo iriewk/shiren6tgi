@@ -24,28 +24,37 @@
             <h1 class="text-2xl font-bold mb-4">ポイント計算 (Score Calculator) </h1>
             <div class="tabs">
                 <div class="tab-header flex">
-                    <button class="tab-button bg-gray-200 py-2 px-4 rounded-t-lg focus:outline-none focus:bg-white">タイムアタック<br>(Time Attack)</button>
-                    <button class="tab-button bg-gray-200 py-2 px-4 rounded-t-lg focus:outline-none focus:bg-white">ターンアタック<br>(Turn Attack)</button>
+                    <button class="tab-button bg-gray-200 py-2 px-4 rounded-t-lg focus:outline-none focus:bg-white border-2 border-red-300">タイムアタック<br>(Time Trial)</button>
+                    <button class="tab-button bg-gray-200 py-2 px-4 rounded-t-lg focus:outline-none focus:bg-white border-2">ターンアタック<br>(Turn Trial)</button>
+                    <button class="tab-button bg-gray-200 py-2 px-4 rounded-t-lg focus:outline-none focus:bg-white border-2">制限アタック<br>(Challenge Trial)</button>
                 </div>
                 <div class="tab-content bg-white p-4 rounded-b-lg shadow">
-                    <div class="tab-pane">
+                    
+                    <div id="tab-time"  class="tab-pane">
                         <div class="mb-4">
                             <label for="time" class="block font-medium text-gray-700 mb-1">タイム (Time)</label>
-                            <input type="time" id="time" onInput="calculateTime()"
-                                class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                step="2" value="00:00:00">
+                            <input type="time" id="time" onInput="calculateTime()" class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500" step="2" value="00:00:00">
                         </div>
-                        <div id="time-result-25" class="styled-text"></div>
-                        <div id="time-result-99" class="styled-text"></div>
+                        <div class="styled-text result-25"></div>
+                        <div class="styled-text result-99"></div>
                     </div>
-                    <div class="tab-pane hidden">
+
+                    <div id="tab-turn"  class="tab-pane hidden">
                         <div class="mb-4">
                             <label for="turn" class="block font-medium text-gray-700 mb-1">ターン (Turn) </label>
-                            <input type="text" id="turn" onInput="calculateTurn()"
-                                class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <input type="text" id="turn" onInput="calculateTurn()" class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                         </div>
-                        <div id="turn-result-25" class="styled-text"></div>
-                        <div id="turn-result-99" class="styled-text"></div>
+                        <div class="styled-text result-25"></div>
+                        <div class="styled-text result-99"></div>
+                    </div>
+
+                    <div id="tab-challenges" class="tab-pane hidden">
+                        <div class="mb-4">
+                            <label for="challenges" class="block font-medium text-gray-700 mb-1">制限数 (Challenges) </label>
+                            <input type="number" id="challenges" onInput="calculateChallenges()" class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500" min="1" max="7">
+                        </div>
+                        <div class="styled-text result-25"></div>
+                        <div class="styled-text result-99"></div>
                     </div>
                 </div>
             </div>
@@ -57,13 +66,19 @@
         const tabPanes = document.querySelectorAll('.tab-pane');
         const turnInput = document.getElementById('turn');
         const timeInput = document.getElementById('time');
+        const challengesInput = document.getElementById('challenges');
 
+        /**
+         * タブ切り替え
+         */
         tabButtons.forEach((button, index) => {
             button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('border-red-300'));
                 // Hide all tab panes
                 tabPanes.forEach((pane) => pane.classList.add('hidden'));
                 // Show the selected tab pane
                 tabPanes[index].classList.remove('hidden');
+                tabButtons[index].classList.add('border-red-300');
             });
         });
 
@@ -71,29 +86,45 @@
          * タイムでポイント計算
          */ 
         function calculateTime() {
+            const tabId = "#tab-time";
             const parts = timeInput.value.split(':').map(Number);
             const time = parts[0] * 3600 + parts[1] * 60 + parts[2];
             const result25 = time == 0 ? 0 : Math.round((1200 / time) * 100) + 25;
             const result99 = time == 0 ? 0 : Math.round((10800 / time) * 100) + 100;
-            document.getElementById('time-result-25').textContent = `25F ${result25}pt`;
-            document.getElementById('time-result-99').textContent = `99F ${result99}pt`;
+            document.querySelector(`${tabId} .result-25`).textContent = `25F ${result25}pt`;
+            document.querySelector(`${tabId} .result-99`).textContent = `99F ${result99}pt`;
         }
         
         /**
          * ターンでポイント計算
          */ 
         function calculateTurn() {
+            const tabId = "#tab-turn";
             const turn = Number(turnInput.value);
             const result25 = turn == 0 ? 0 : Math.round((2500 / turn) * 100) + 26;
             const result99 = turn == 0 ? 0 : Math.round((17500 / turn) * 100) + 100;
-            document.getElementById('turn-result-25').textContent = `25F ${result25}pt`;
-            document.getElementById('turn-result-99').textContent = `99F ${result99}pt`;
+            document.querySelector(`${tabId} .result-25`).textContent = `25F ${result25}pt`;
+            document.querySelector(`${tabId} .result-99`).textContent = `99F ${result99}pt`;
+        }
+
+        /**
+         * 制限でポイント計算
+         */ 
+        function calculateChallenges() {
+            const tabId = "#tab-challenges";
+            const challenges = Number(challengesInput.value);
+            const result25 = turn == 0 ? 0 : (challenges * 30) + 26;
+            const result99 = turn == 0 ? 0 : (challenges * 40) + 100;
+            document.querySelector(`${tabId} .result-25`).textContent = `25F ${result25}pt`;
+            document.querySelector(`${tabId} .result-99`).textContent = `99F ${result99}pt`;
         }
 
         timeInput.value = "03:00:00";
         turnInput.value = "17500";
+        challengesInput.value = "1";
         calculateTime();
         calculateTurn();
+        calculateChallenges();
     </script>
 </body>
 
